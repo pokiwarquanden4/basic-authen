@@ -17,10 +17,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
+
 @Component
 public class RateLimitFilter extends OncePerRequestFilter {
-    @Autowired
-    private IUserRepository userRepository;
     @Autowired
     private IRateLimitService rateLimitingService;
 
@@ -30,17 +30,26 @@ public class RateLimitFilter extends OncePerRequestFilter {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null) {
-            User loggedInUser = userRepository.findByUsername(authentication.getName()).get();
-            final Bucket tokenBucket = rateLimitingService.resolveBucket(loggedInUser.getId());
-            final ConsumptionProbe probe = tokenBucket.tryConsumeAndReturnRemaining(1);
+            Optional<User> optionalLoggedInUser = rateLimitingService.getByUsername(authentication);
+            if (optionalLoggedInUser.isPresent()) {
+//                User loggedInUser = optionalLoggedInUser.get();
+                final Bucket tokenBucket = rateLimitingService.resolveBucket(authentication);
+                final ConsumptionProbe probe = tokenBucket.tryConsumeAndReturnRemaining(1);
 
-            if (!probe.isConsumed()) {
-                long waitForRefill = probe.getNanosToWaitForRefill() / 1_000_000_000;
-                response.addHeader("Retry After Seconds", String.valueOf(waitForRefill));
-                response.sendError(HttpStatus.TOO_MANY_REQUESTS.value(),
-                        "Request limit linked to your current plan has been exhausted");
+                if (!probe.isConsumed()) {
+                    long waitForRefill = probe.getNanosToWaitForRefill() / 1_000_000_000;
+                    response.addHeader("Retry After Seconds", String.valueOf(waitForRefill));
+                    response.sendError(HttpStatus.TOO_MANY_REQUESTS.value(),
+                            "Request limit linked to your current plan has been exhausted");
+                    return;
+                }
+            } else {
+                response.sendError(HttpStatus.UNAUTHORIZED.value(), "Authentication failed");
+                return;
             }
         }
         filterChain.doFilter(request, response);
     }
+
+
 }

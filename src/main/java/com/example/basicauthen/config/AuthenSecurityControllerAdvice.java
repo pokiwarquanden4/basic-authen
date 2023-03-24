@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 public class AuthenSecurityControllerAdvice {
     @ModelAttribute
     public UserPrinciple customPrincipal(Authentication a) {
-        return (UserPrinciple)(a == null ? null : a.getPrincipal());
+        return (UserPrinciple) (a == null ? null : a.getPrincipal());
     }
 }
 

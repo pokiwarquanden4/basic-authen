@@ -3,6 +3,7 @@ package com.example.basicauthen.model;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import java.io.Serializable;
 
 @Entity
@@ -19,5 +20,6 @@ public class Plan implements Serializable {
     private String name;
 
     @Column(name = "limit_per_hour", nullable = false, unique = true)
+    @Min(1)
     private Integer limitPerHour;
 }

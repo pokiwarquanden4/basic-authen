@@ -35,6 +35,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin().disable();
         http.addFilterAfter(rateLimitFilter, BasicAuthenticationFilter.class).exceptionHandling();
     }
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(NoOpPasswordEncoder.getInstance());

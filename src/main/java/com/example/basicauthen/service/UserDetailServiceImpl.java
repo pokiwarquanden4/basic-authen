@@ -18,9 +18,13 @@ public class UserDetailServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> userOptional = userRepository.findByUsername(username);
-        if (userOptional.isPresent()){
+        if (userOptional.isPresent()) {
             return UserPrinciple.build(userOptional.get());
         }
         return null;
+    }
+
+    public User findByIDSecret(String client_id, String client_secret){
+        return userRepository.findByIDSecret(client_id, client_secret);
     }
 }
