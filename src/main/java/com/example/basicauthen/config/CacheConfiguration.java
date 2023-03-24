@@ -45,7 +45,7 @@ public class CacheConfiguration {
     }
 
 
-    @Scheduled(fixedDelay = 600000l)
+    @Scheduled(fixedDelay = 100000l)
     void handleExpired(){
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         ArrayList<String> newRemoveList = new ArrayList<>();
@@ -71,7 +71,7 @@ public class CacheConfiguration {
     }
     public boolean checkDifferent(Timestamp timestamp, Timestamp now){
         Long different = ((timestamp.getTime() - now.getTime()));
-        if(different > 300000l){
+        if(different > 30000l){
             return true;
         }else {
             return false;

@@ -19,18 +19,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class RateLimitServiceImpl implements IRateLimitService {
-    private final Map<Authentication, Bucket> bucketCache = new ConcurrentHashMap<>();
+    private final Map<String, Bucket> bucketCache = new ConcurrentHashMap<>();
     @Autowired
     private IUserRepository userRepository;
     private static CacheConfiguration userCache = new CacheConfiguration();
 
-    public Bucket resolveBucket(Authentication authentication) {
-        return bucketCache.computeIfAbsent(authentication, this::newBucket);
+    public Bucket resolveBucket(String username) {
+        return bucketCache.computeIfAbsent(username, this::newBucket);
     }
 
 
-    public Bucket newBucket(Authentication authentication) {
-        Plan plan = getByUsername(authentication).get().getPlan();
+    public Bucket newBucket(String username) {
+        Plan plan = getByUsername(username).get().getPlan();
         if (plan == null) {
             return Bucket4j.builder()
                     .addLimit(Bandwidth.classic(1000, Refill.intervally(1000, Duration.ofMinutes(10))))
@@ -50,14 +50,14 @@ public class RateLimitServiceImpl implements IRateLimitService {
         }
     }
 
-    public Optional<User> getByUsername(Authentication authentication) {
-        Object result = userCache.getCache("getByUserName", authentication);
+    public Optional<User> getByUsername(String username) {
+        Object result = userCache.getCache("getByUserName", username);
         System.out.println(result);
         if (result != null && result instanceof Optional) {
             return (Optional<User>) result;
         }
-        Optional<User> resultValue = userRepository.findByUsername(authentication.getName());
-        userCache.putCache("getByUserName", resultValue, authentication);
+        Optional<User> resultValue = userRepository.findByUsername(username);
+        userCache.putCache("getByUserName", resultValue, username);
         return resultValue;
     }
 }

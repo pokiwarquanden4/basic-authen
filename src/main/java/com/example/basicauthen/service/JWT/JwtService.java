@@ -29,12 +29,13 @@ public class JwtService {
     ){
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
-        Date validity = new Date(nowMillis + 30*1000); // token validity period: 1 hour
+        Date validity = new Date(nowMillis + 60*60*1000); // token validity period: 1 hour
 
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
+                .claim("password", userDetails.getPassword())
                 .setIssuedAt(now)
                 .setExpiration(validity)
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
@@ -42,6 +43,13 @@ public class JwtService {
     }
     public String extractUserName(String token){
         return extractClaim(token, Claims::getSubject);
+    }
+    public String extractPassword(String token){
+        return extractClaim(token, "password");
+    }
+    public String extractClaim(String token, String claimName){
+        Claims claims = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+        return claims.get(claimName).toString();
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver){

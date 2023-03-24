@@ -7,9 +7,9 @@ import org.springframework.security.core.Authentication;
 import java.util.Optional;
 
 public interface IRateLimitService {
-    Bucket newBucket(Authentication authentication);
+    Bucket newBucket(String username);
 
-    Bucket resolveBucket(Authentication authentication);
+    Bucket resolveBucket(String username);
 
-    Optional<User> getByUsername(Authentication authentication);
+    Optional<User> getByUsername(String username);
 }

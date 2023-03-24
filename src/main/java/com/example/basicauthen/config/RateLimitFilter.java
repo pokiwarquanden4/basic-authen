@@ -30,10 +30,11 @@ public class RateLimitFilter extends OncePerRequestFilter {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null) {
-            Optional<User> optionalLoggedInUser = rateLimitingService.getByUsername(authentication);
+            String username = authentication.getName();
+            Optional<User> optionalLoggedInUser = rateLimitingService.getByUsername(username);
             if (optionalLoggedInUser.isPresent()) {
 //                User loggedInUser = optionalLoggedInUser.get();
-                final Bucket tokenBucket = rateLimitingService.resolveBucket(authentication);
+                final Bucket tokenBucket = rateLimitingService.resolveBucket(username);
                 final ConsumptionProbe probe = tokenBucket.tryConsumeAndReturnRemaining(1);
 
                 if (!probe.isConsumed()) {

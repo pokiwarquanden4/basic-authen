@@ -1,5 +1,7 @@
 package com.example.basicauthen.config;
 
+import com.example.basicauthen.Constant.EnableTokenPath;
+import com.example.basicauthen.config.JwtConfig.JwtAuthenticationFilter;
 import com.example.basicauthen.service.UserDetailServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -19,11 +21,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private UserDetailServiceImpl userDetailsService;
     @Autowired
     private RateLimitFilter rateLimitFilter;
-
-
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
+        http    .authorizeRequests()
+                .antMatchers("/createToken").permitAll()
+                .antMatchers(EnableTokenPath.report).hasAuthority("RENTESEG")
+                .antMatchers(EnableTokenPath.reportUser).hasAuthority("RENTESEG")
+                .antMatchers(EnableTokenPath.demo).hasAuthority("ADMIN")
+                .and()
                 //HTTP Basic authentication
                 .httpBasic()
                 .and()
@@ -33,7 +40,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf().disable()
                 .formLogin().disable();
-        http.addFilterAfter(rateLimitFilter, BasicAuthenticationFilter.class).exceptionHandling();
+        http.addFilterBefore(rateLimitFilter, BasicAuthenticationFilter.class).exceptionHandling();
+        http.addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class).exceptionHandling();
     }
 
     @Override
