@@ -38,8 +38,11 @@ public class TestController {
         UserDetails userDetails = userDetailService.loadUserByUsername(user.getUsername());
         User userDB = userDetailService.findByIDSecret(user.getClient_id(), user.getClient_secret());
         if (userDetails != null && userDB != null){
+
             //Create Token
             String token = jwtService.generateToken(userDetails);
+
+
             return new ResponseEntity<>(new TokenResponse(token), HttpStatus.OK);
         }
         return null;
@@ -61,10 +64,9 @@ public class TestController {
     }
 
     @PostMapping(EnableTokenPath.test)
-    public ResponseEntity<String> decodeToken(@RequestHeader("Authorization") String authHeader){
-        String token = authHeader.substring(7);
-        String value = jwtService.extractUserName(token) + " : " + jwtService.extractPassword(token);
-        System.out.println(value);
+    public ResponseEntity<String> decodeToken(@RequestBody String bearerToken){
+        System.out.println(bearerToken);
+        String value = jwtService.extractUserName(bearerToken) + " : " + jwtService.extractPassword(bearerToken);
         return new ResponseEntity<>(value, HttpStatus.OK);
     }
 

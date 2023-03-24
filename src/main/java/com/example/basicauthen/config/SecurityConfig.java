@@ -29,7 +29,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/createToken").permitAll()
                 .antMatchers(EnableTokenPath.report).hasAuthority("RENTESEG")
                 .antMatchers(EnableTokenPath.reportUser).hasAuthority("RENTESEG")
-                .antMatchers(EnableTokenPath.demo).hasAuthority("ADMIN")
                 .and()
                 //HTTP Basic authentication
                 .httpBasic()
