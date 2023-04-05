@@ -7,6 +7,10 @@ import com.example.basicauthen.model.User;
 import com.example.basicauthen.service.JWT.JwtService;
 import com.example.basicauthen.service.Report.ReportService;
 import com.example.basicauthen.service.UserDetailServiceImpl;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,16 +37,14 @@ public class TestController {
     ReportService reportService;
 
     @PostMapping(EnableTokenPath.createToken)
-    public ResponseEntity<TokenResponse> login(@RequestBody User user) {
+    public ResponseEntity<TokenResponse> login(@RequestBody CreateToken user) {
         //Authentication
-        UserDetails userDetails = userDetailService.loadUserByUsername(user.getUsername());
+        UserDetails userDetails = userDetailService.loadUserByUsername(user.getGrand_type());
         User userDB = userDetailService.findByIDSecret(user.getClient_id(), user.getClient_secret());
         if (userDetails != null && userDB != null){
 
             //Create Token
             String token = jwtService.generateToken(userDetails);
-
-
             return new ResponseEntity<>(new TokenResponse(token), HttpStatus.OK);
         }
         return null;
@@ -69,10 +71,14 @@ public class TestController {
         String value = jwtService.extractUserName(bearerToken) + " : " + jwtService.extractPassword(bearerToken);
         return new ResponseEntity<>(value, HttpStatus.OK);
     }
-
-//    @GetMapping("/excelReader/{fileName}")
-//    public List<List<String>> excelReader(@PathVariable String fileName) throws IOException {
-//        // Extract the encoded username and password from the header
-//        return ReadExcelFileService.readExcelFile(fileName);
-//    }
+}
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+class CreateToken{
+    private String grand_type;
+    private String password;
+    private String client_id;
+    private String client_secret;
 }

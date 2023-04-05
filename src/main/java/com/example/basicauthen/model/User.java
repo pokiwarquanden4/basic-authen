@@ -13,7 +13,7 @@ public class User {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String username;
+    private String grand_type;
 
     @Column(nullable = false)
     private String password;

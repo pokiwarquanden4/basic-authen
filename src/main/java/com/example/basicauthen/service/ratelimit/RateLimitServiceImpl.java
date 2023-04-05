@@ -56,7 +56,7 @@ public class RateLimitServiceImpl implements IRateLimitService {
         if (result != null && result instanceof Optional) {
             return (Optional<User>) result;
         }
-        Optional<User> resultValue = userRepository.findByUsername(username);
+        Optional<User> resultValue = userRepository.findByGrandType(username);
         userCache.putCache("getByUserName", resultValue, username);
         return resultValue;
     }
